@@ -55,12 +55,14 @@ async function generateSuggestions(input, context, user) {
     : "";
 
   const prompt = `Given the following context:
-User Profile: Age ${user.age}, Location: ${user.location}, Language: ${user.language}
+User Profile: Name: ${user.name} Age: ${user.age}, Location: ${user.location}, Language: ${user.language}
 Call Context: ${context}
 User Input: ${input.callerInput}${keywordPrompt}
 
-Generate 3 appropriate responses for the user, considering their profile, the call context, 
-and the keyword (if provided). Each response should be concise and easy to articulate.`;
+Generate 3 appropriate responses for the user. The responses should be made from the perspective
+of the users, tailored for their needs under certain scenarios considering their profile background,
+the call context, and the keywordPrompt. 
+Each response should be concise, from the user's and easy to articulate.`;
 
   const postBody = {
     model: "gpt-3.5-turbo",
@@ -143,7 +145,7 @@ router.post("/process-input", async (req, res) => {
   const { userId, callerInput, keywordInput = "" } = req.body;
 
   if (!userId || (!callerInput && !keywordInput)) {
-    return res.status(400).json({ error: "Missing userId or callerInput" });
+    return res.status(400).json({ error: "Missing userId or input" });
   }
 
   let conversation = activeConversations.get(userId);
@@ -168,11 +170,14 @@ router.post("/process-input", async (req, res) => {
     activeConversations.set(userId, conversation);
   }
 
-  conversation.context += `\nCaller: ${callerInput}`;
-  await writeChatContext({
-    context: conversation.context,
-    historicalChoices: conversation.historicalChoices,
-  });
+  // Only add to context if callerInput is not empty
+  if (callerInput && callerInput.trim() !== "") {
+    conversation.context += `\nCaller: ${callerInput.trim()}`;
+    await writeChatContext({
+      context: conversation.context,
+      historicalChoices: conversation.historicalChoices,
+    });
+  }
 
   try {
     const suggestions = await generateSuggestions(
