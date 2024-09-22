@@ -53,6 +53,8 @@ const Chat = () => {
 
   const [loading, setLoading] = useState(false);
 
+  const messagesEndRef = useRef(null);
+
   useEffect(() => {
     (async () => {
       const res = await axios.get(
@@ -72,6 +74,17 @@ const Chat = () => {
       }
     })();
   }, []);
+
+  // Scroll to bottom whenever messages or suggestions change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, suggestions, loading]);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   const startRecording = () => {
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
@@ -258,6 +271,7 @@ const Chat = () => {
             ))}
           </ButtonGroup>
         )}
+
         {loading && (
           <Box>
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
@@ -268,6 +282,9 @@ const Chat = () => {
             </Box>
           </Box>
         )}
+
+        {/* Empty div to reference for scrolling */}
+        <div ref={messagesEndRef} />
       </Box>
 
       <Box sx={styles.inputContainer}>
