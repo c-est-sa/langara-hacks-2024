@@ -28,6 +28,14 @@ async function readUserData() {
   }
 }
 
+async function writeUserData(data) {
+  try {
+    await fs.writeFile(USER_DATA_FILE, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error("Error writing user data:", error);
+  }
+}
+
 async function readChatContext() {
   try {
     const data = await fs.readFile(CHAT_CONTEXT_FILE, "utf8");
@@ -122,6 +130,25 @@ router.get("/user-profile", async (req, res) => {
   } catch (error) {
     console.error("Error retrieving user profile:", error);
     res.status(500).json({ error: "Failed to retrieve user profile" });
+  }
+});
+
+router.post("/user-profile", async (req, res) => {
+  const { id, name, age, location, language } = req.body;
+
+  if (!id || !name || !age || !location || !language) {
+    return res
+      .status(400)
+      .json({ error: "Missing required fields for user profile" });
+  }
+
+  try {
+    const userData = { users: [{ id, name, age, location, language }] };
+    await writeUserData(userData);
+    res.json({ message: "User profile saved successfully" });
+  } catch (error) {
+    console.error("Error saving user profile:", error);
+    res.status(500).json({ error: "Failed to save user profile" });
   }
 });
 

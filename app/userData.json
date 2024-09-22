@@ -2,8 +2,9 @@
   "users": [
     {
       "id": "1",
-      "age": 25,
-      "location": "New York",
+      "name": "Lora",
+      "age": "29",
+      "location": "London",
       "language": "English"
     }
   ]
