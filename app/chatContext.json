@@ -1,4 +1,9 @@
 {
-  "context": "\nCaller: I need help with my internet connection",
-  "historicalChoices": []
+  "context": "\nCaller: hello how can I help you today\nAgent: I'd like to open a new account, please.\nCaller: sure do you prefer business account or personal one\nAgent: I'd like to open a personal account, not a business one.\nCaller: all right do you have your driver's license card with you today\nAgent: No, I don't have my driver's license with me right now.\nCaller: okay you have to provide me with your any sort of ID do you have anyone anything\nAgent: I have my passport as identification.",
+  "historicalChoices": [
+    "I'd like to open a new account, please.",
+    "I'd like to open a personal account, not a business one.",
+    "No, I don't have my driver's license with me right now.",
+    "I have my passport as identification."
+  ]
 }
