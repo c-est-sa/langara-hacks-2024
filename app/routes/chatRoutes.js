@@ -140,7 +140,9 @@ router.get("/convo-history", async (req, res) => {
 });
 
 // Input: { userId: string, callerInput: string, keywordInput: string (optional) }
-// Output: { suggestions: [string, string, string], disclaimer: string (optional), disclaimerAudio: string (base64 encoded audio, optional) }
+// Output: 
+//   - If disclaimer: audio/mpeg file
+//   - Else: { suggestions: [string, string, string], disclaimer: string (optional) }
 router.post("/process-input", async (req, res) => {
   const { userId, callerInput, keywordInput = "" } = req.body;
 
@@ -172,11 +174,17 @@ router.post("/process-input", async (req, res) => {
 
   // Check if it's the first time the user talks and there's no "\nAgent" in the context
   let disclaimer = null;
-  let disclaimerAudio = null;
   if (!conversation.context.includes("\nAgent")) {
     disclaimer = generateDisclaimer(conversation.userProfile);
     try {
-      disclaimerAudio = await textToSpeech(disclaimer);
+      const audioContent = await textToSpeech(disclaimer);
+      
+      res.set({
+        "Content-Type": "audio/mpeg",
+        "Content-Disposition": 'attachment; filename="disclaimer.mp3"',
+      });
+
+      return res.send(Buffer.from(audioContent, "binary"));
     } catch (error) {
       console.error("Error generating disclaimer audio:", error);
     }
@@ -199,11 +207,7 @@ router.post("/process-input", async (req, res) => {
     );
 
     conversation.lastSuggestions = suggestions;
-    res.json({ 
-      suggestions, 
-      disclaimer,
-      disclaimerAudio: disclaimerAudio ? disclaimerAudio.toString('base64') : null 
-    });
+    res.json({ suggestions, disclaimer });
   } catch (error) {
     console.error("Error generating suggestions:", error);
     res.status(500).json({ error: "Failed to generate suggestions" });
