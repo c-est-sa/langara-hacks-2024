@@ -154,7 +154,9 @@ router.post("/process-input", async (req, res) => {
   let disclaimer = null;
   let disclaimerAudio = null;
 
-  if (!conversation.context.includes("\nAgent")) {
+  console.log("Conversation context:", conversation.context);
+
+  if (!conversation.context.toLowerCase().includes("agent")) {
     disclaimer = generateDisclaimer(conversation.userProfile);
     try {
       disclaimerAudio = await textToSpeech(disclaimer); // Get disclaimer audio
@@ -191,7 +193,7 @@ router.post("/process-input", async (req, res) => {
 
 // Generate disclaimer text
 function generateDisclaimer(userProfile) {
-  return `Hello! I'm ${userProfile.name}. I currently have difficulty communicating smoothly.
+  return `Hello! I currently have difficulty communicating smoothly.
   I'm using EasyTalk. Thanks for your understanding!`;
 }
 
