@@ -105,7 +105,7 @@ async function textToSpeech(text) {
 
   try {
     const [response] = await ttsClient.synthesizeSpeech(request);
-    return response.audioContent;
+    return Buffer.from(response.audioContent, 'base64');
   } catch (error) {
     console.error("Error generating speech:", error);
     throw new Error("Failed to generate speech");
@@ -184,7 +184,7 @@ router.post("/process-input", async (req, res) => {
         "Content-Disposition": 'attachment; filename="disclaimer.mp3"',
       });
 
-      return res.send(Buffer.from(audioContent, "binary"));
+      return res.send(audioContent);
     } catch (error) {
       console.error("Error generating disclaimer audio:", error);
     }
@@ -252,7 +252,7 @@ router.post("/choose-suggestion", async (req, res) => {
       "Content-Disposition": 'attachment; filename="response.mp3"',
     });
 
-    res.send(Buffer.from(audioContent, "binary"));
+    return res.send(audioContent);
   } catch (error) {
     console.error("Error during Text-to-Speech:", error);
     res.status(500).json({ error: "Failed to convert text to speech" });
