@@ -7,6 +7,7 @@ import {
   // InputLabel,
   // FormControl,
   Box,
+  Typography,
 } from "@mui/material";
 import axios from "axios";
 
@@ -99,6 +100,7 @@ const UserProfile = () => {
       setSnackbarMessage("Profile updated successfully!");
       setSnackbarSeverity("success");
       setSnackbarOpen(true);
+      clearHistory();
     } catch (error) {
       setSnackbarMessage("Error saving user profile.");
       setSnackbarSeverity("error");
@@ -122,9 +124,25 @@ const UserProfile = () => {
     setSnackbarOpen(false);
   };
 
+  const clearHistory = async () => {
+    // Backend: clear the chat history
+    const res = await axios.post("http://localhost:3000/api/chat/end-call", {
+      userId: "1",
+    });
+
+    console.log(res.data);
+  };
+
   return (
     <Box sx={{ width: "400px", margin: "auto", padding: "80px" }}>
-      <form onSubmit={handleSubmit}>
+      <form
+        onSubmit={handleSubmit}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
         <TextField
           label="Name"
           name="name"
@@ -175,11 +193,14 @@ const UserProfile = () => {
           variant="contained"
           color="primary"
           type="submit"
-          sx={{ margin: 2 }}
+          sx={{ margin: 2, display: "block" }}
           disabled={shouldButtonDisabled()}
         >
           Save Changes
         </Button>
+        <Typography variant="caption" sx={{ color: "gray" }}>
+          User profile change will clear current conversation history.
+        </Typography>
       </form>
 
       {/* Snackbar component for success or error messages */}

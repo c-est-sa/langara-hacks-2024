@@ -1,6 +1,4 @@
 {
-  "context": "\nCaller: so I just like talk a lot and then maybe I have a stutter so I can remember\nAgent: Hello, I understand you like to talk a lot. It's okay if you stutter, take your time to express yourself.",
-  "historicalChoices": [
-    "Hello, I understand you like to talk a lot. It's okay if you stutter, take your time to express yourself."
-  ]
+  "context": "",
+  "historicalChoices": []
 }
