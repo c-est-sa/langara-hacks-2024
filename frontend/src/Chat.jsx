@@ -219,7 +219,7 @@ const Chat = () => {
           onClick={clearHistory}
           sx={{
             zIndex: 999,
-            position: "absolute",
+            position: "fixed",
             top: 10,
             right: 10,
             height: "40px",
