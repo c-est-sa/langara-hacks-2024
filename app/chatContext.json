@@ -1,6 +1,9 @@
 {
-  "context": "\nCaller: \nAgent: In New York, it's normal for people in their mid-20s to be independent and building their careers.",
+  "context": "\nCaller: \nAgent: Alright, I can assist you with that. How can I help you today?\nCaller: I want to create an account\nAgent: Sure, would you like to create a personal or business account?\nCaller: business please\nAgent: Certainly, to create a business account, we'll need some identification. Do you have a driver's license or passport handy?\nCaller: I have a driver's license card\nAgent: Excellent, having your driver's license card handy will make the process of creating your business account smooth and efficient.\nCaller: so what should I do next",
   "historicalChoices": [
-    "In New York, it's normal for people in their mid-20s to be independent and building their careers."
+    "Alright, I can assist you with that. How can I help you today?",
+    "Sure, would you like to create a personal or business account?",
+    "Certainly, to create a business account, we'll need some identification. Do you have a driver's license or passport handy?",
+    "Excellent, having your driver's license card handy will make the process of creating your business account smooth and efficient."
   ]
 }

@@ -6,6 +6,7 @@ import {
   Button,
   Paper,
   IconButton,
+  CircularProgress,
 } from "@mui/material";
 import { Mic } from "@mui/icons-material";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
@@ -49,6 +50,8 @@ const Chat = () => {
   const [keywords, setKeywords] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [messages, setMessages] = useState([]);
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -121,22 +124,26 @@ const Chat = () => {
 
   const getSuggestions = async (e) => {
     e.preventDefault();
-    console.log(transcript, keywords);
-    const res = await axios.post(
-      "http://localhost:3000/api/chat/process-input",
-      {
-        userId: "1",
-        callerInput: transcript,
-        keywordInput: keywords,
-      }
-    );
-
-    console.log(res.data);
-    setSuggestions(res.data.suggestions);
-
-    setTranscript("");
-    setInput("");
-    setKeywords("");
+    setLoading(true);
+    // console.log(transcript, keywords);
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/chat/process-input",
+        {
+          userId: "1",
+          callerInput: transcript,
+          keywordInput: keywords,
+        }
+      );
+      setSuggestions(res.data.suggestions);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+      setTranscript("");
+      setInput("");
+      setKeywords("");
+    }
   };
 
   const chooseSuggestion = async (suggestion) => {
@@ -226,7 +233,7 @@ const Chat = () => {
           </Box>
         ))}
 
-        {suggestions.length > 0 ? (
+        {suggestions.length > 0 && (
           <ButtonGroup
             orientation="vertical"
             aria-label="Vertical button group"
@@ -250,7 +257,17 @@ const Chat = () => {
               </Button>
             ))}
           </ButtonGroup>
-        ) : null}
+        )}
+        {loading && (
+          <Box>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+              <CircularProgress sx={{ display: "block" }} />
+            </Box>
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+              <Typography sx={{ ml: 1 }}>Loading suggestions...</Typography>
+            </Box>
+          </Box>
+        )}
       </Box>
 
       <Box sx={styles.inputContainer}>
