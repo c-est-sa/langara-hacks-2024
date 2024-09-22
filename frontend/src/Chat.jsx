@@ -6,12 +6,10 @@ import {
   Button,
   Paper,
   IconButton,
-  CircularProgress,
 } from "@mui/material";
 import { Mic } from "@mui/icons-material";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import AssistantIcon from "@mui/icons-material/Assistant";
-import CallEndIcon from "@mui/icons-material/CallEnd";
 import ButtonGroup from "@mui/material/ButtonGroup";
 import axios from "axios";
 // import { use } from "../../app/routes/chatRoutes";
@@ -51,10 +49,6 @@ const Chat = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [messages, setMessages] = useState([]);
 
-  const [loading, setLoading] = useState(false);
-
-  const messagesEndRef = useRef(null);
-
   useEffect(() => {
     (async () => {
       const res = await axios.get(
@@ -74,17 +68,6 @@ const Chat = () => {
       }
     })();
   }, []);
-
-  // Scroll to bottom whenever messages or suggestions change
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, suggestions, loading]);
-
-  const scrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
 
   const startRecording = () => {
     if (window.SpeechRecognition || window.webkitSpeechRecognition) {
@@ -135,28 +118,23 @@ const Chat = () => {
     }
   };
 
-  const getSuggestions = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    // console.log(transcript, keywords);
-    try {
-      const res = await axios.post(
-        "http://localhost:3000/api/chat/process-input",
-        {
-          userId: "1",
-          callerInput: transcript,
-          keywordInput: keywords,
-        }
-      );
-      setSuggestions(res.data.suggestions);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-      setTranscript("");
-      setInput("");
-      setKeywords("");
-    }
+  const getSuggestions = async () => {
+    console.log(transcript, keywords);
+    const res = await axios.post(
+      "http://localhost:3000/api/chat/process-input",
+      {
+        userId: "1",
+        callerInput: transcript,
+        keywordInput: keywords,
+      }
+    );
+
+    console.log(res.data);
+    setSuggestions(res.data.suggestions);
+
+    setTranscript("");
+    setInput("");
+    setKeywords("");
   };
 
   const chooseSuggestion = async (suggestion) => {
@@ -198,27 +176,10 @@ const Chat = () => {
     setSuggestions([]);
   };
 
-  const clearHistory = async () => {
-    // Backend: clear the chat history
-    const res = await axios.post("http://localhost:3000/api/chat/end-call", {
-      userId: "1",
-    });
-
-    // Frontend: clear the messages
-    setMessages([]);
-    console.log(res.data);
-  };
 
   return (
     <>
-      <Button
-        variant="contained"
-        endIcon={<CallEndIcon />}
-        onClick={clearHistory}
-        sx={{ zIndex: 999, position: "fixed", top: 0, right: 0 }}
-      >
-        clear history
-      </Button>
+    
       <Box sx={styles.messagesContainer}>
         {messages.map((msg, index) => (
           <Box
@@ -230,7 +191,9 @@ const Chat = () => {
               mb: 2,
             }}
           >
+            
             <Paper sx={{ maxWidth: "90%" }}>
+              
               <Typography
                 variant="body1"
                 sx={{
@@ -246,7 +209,7 @@ const Chat = () => {
           </Box>
         ))}
 
-        {suggestions.length > 0 && (
+        {suggestions.length > 0 ? (
           <ButtonGroup
             orientation="vertical"
             aria-label="Vertical button group"
@@ -270,51 +233,33 @@ const Chat = () => {
               </Button>
             ))}
           </ButtonGroup>
-        )}
-
-        {loading && (
-          <Box>
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <CircularProgress sx={{ display: "block" }} />
-            </Box>
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Typography sx={{ ml: 1 }}>Loading suggestions...</Typography>
-            </Box>
-          </Box>
-        )}
-
-        {/* Empty div to reference for scrolling */}
-        <div ref={messagesEndRef} />
+        ) : null}
       </Box>
 
       <Box sx={styles.inputContainer}>
-        <Box>
-          <form
-            style={{ display: "flex", alignItems: "center" }}
-            onSubmit={getSuggestions}
-          >
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Type keywords..."
-              value={input}
-              onChange={(e) => {
-                setInput(e.target.value);
-                setKeywords(e.target.value);
-              }}
-              sx={{ mr: 1 }}
-            />
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {/* <form> */}
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Type keywords..."
+            value={input}
+            onChange={(e) => {
+              setInput(e.target.value);
+              setKeywords(e.target.value);
+            }}
+            sx={{ mr: 1 }}
+          />
 
-            <Button
-              type="submit"
-              variant="contained"
-              endIcon={<AssistantIcon />}
-              // onClick={getSuggestions}
-              disabled={recording || !input}
-            >
-              get suggestions
-            </Button>
-          </form>
+          <Button
+            variant="contained"
+            endIcon={<AssistantIcon />}
+            onClick={getSuggestions}
+            disabled={recording || !input}
+          >
+            get suggestions
+          </Button>
+          {/* </form> */}
         </Box>
         <IconButton
           color="primary"
