@@ -7,14 +7,15 @@ import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import logo from "./assets/logo-title.png";
 import MenuIcon from "@mui/icons-material/Menu";
- import CallEndIcon from "@mui/icons-material/CallEnd";
+// import CallEndIcon from "@mui/icons-material/CallEnd";
 import PermPhoneMsgIcon from "@mui/icons-material/PermPhoneMsg";
 import PersonIcon from "@mui/icons-material/Person";
-import { Typography } from "@mui/material";
+// import axios from "axios";
 
 export default function Header(props) {
-  // eslint-disable-next-line react/prop-types
+  // eslint-disable-next-line react/prop-types, no-unused-vars
   const { navigate, getCurrentPath } = props;
   const [open, setOpen] = React.useState(false);
 
@@ -26,17 +27,16 @@ export default function Header(props) {
     navigate(path);
     setOpen(false);
   };
-  const clearHistory = async () => {
-    // Backend: clear the chat history
-    const res = await axios.post("http://localhost:3000/api/chat/end-call", {
-      userId: "1",
-    });
+  // const clearHistory = async () => {
+  //   // Backend: clear the chat history
+  //   const res = await axios.post("http://localhost:3000/api/chat/end-call", {
+  //     userId: "1",
+  //   });
 
-    // Frontend: clear the messages
-    setMessages([]);
-    console.log(res.data);
-  };
-
+  //   // Frontend: clear the messages
+  //   setMessages([]);
+  //   console.log(res.data);
+  // };
 
   const DrawerList = (
     <Box
@@ -87,18 +87,18 @@ export default function Header(props) {
           <MenuIcon />
         </Button>
         <img
-  src="src/assets/logo-title.png" 
-  alt="Easy Talk Logo"
-  style={{ height: "60px", lineHeight: "60px" }} 
-/>
-        <Button
-        variant="contained"
-        endIcon={<CallEndIcon />}
-        onClick={clearHistory}
-        sx={{ position: "absolute", top: 10, right: 10, height: "70%" }}
+          src={logo}
+          alt="Easy Talk Logo"
+          style={{ height: "60px", lineHeight: "60px" }}
+        />
+        {/* <Button
+          variant="contained"
+          endIcon={<CallEndIcon />}
+          onClick={clearHistory}
+          sx={{ position: "absolute", top: 10, right: 10, height: "70%" }}
         >
-        clear history
-      </Button>
+          clear history
+        </Button> */}
       </header>
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}

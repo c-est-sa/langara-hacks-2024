@@ -11,6 +11,7 @@ import { Mic } from "@mui/icons-material";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import AssistantIcon from "@mui/icons-material/Assistant";
 import ButtonGroup from "@mui/material/ButtonGroup";
+import CallEndIcon from "@mui/icons-material/CallEnd";
 import axios from "axios";
 // import { use } from "../../app/routes/chatRoutes";
 
@@ -21,6 +22,7 @@ const styles = {
     padding: 2,
     paddingTop: "75px",
     paddingBottom: "150px",
+    position: "relative",
   },
   inputContainer: {
     borderTop: 1,
@@ -176,11 +178,34 @@ const Chat = () => {
     setSuggestions([]);
   };
 
+  const clearHistory = async () => {
+    // Backend: clear the chat history
+    const res = await axios.post("http://localhost:3000/api/chat/end-call", {
+      userId: "1",
+    });
+
+    // Frontend: clear the messages
+    setMessages([]);
+    console.log(res.data);
+  };
 
   return (
     <>
-    
       <Box sx={styles.messagesContainer}>
+        <Button
+          variant="contained"
+          endIcon={<CallEndIcon />}
+          onClick={clearHistory}
+          sx={{
+            zIndex: 999,
+            position: "absolute",
+            top: 10,
+            right: 10,
+            height: "40px",
+          }}
+        >
+          clear history
+        </Button>
         {messages.map((msg, index) => (
           <Box
             key={index}
@@ -191,9 +216,7 @@ const Chat = () => {
               mb: 2,
             }}
           >
-            
             <Paper sx={{ maxWidth: "90%" }}>
-              
               <Typography
                 variant="body1"
                 sx={{
