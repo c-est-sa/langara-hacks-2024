@@ -88,6 +88,13 @@ const UserProfile = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log({
+      id: "1",
+      name: profile.name,
+      age: profile.age,
+      location: profile.location,
+      language: profile.language,
+    });
     try {
       await axios.post("http://localhost:3000/api/chat/user-profile", {
         id: "1",

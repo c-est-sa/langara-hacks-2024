@@ -113,7 +113,7 @@ async function textToSpeech(text) {
 
   try {
     const [response] = await ttsClient.synthesizeSpeech(request);
-    return Buffer.from(response.audioContent, 'base64');
+    return Buffer.from(response.audioContent, "base64");
   } catch (error) {
     console.error("Error generating speech:", error);
     throw new Error("Failed to generate speech");
@@ -137,6 +137,8 @@ router.get("/user-profile", async (req, res) => {
 
 router.post("/user-profile", async (req, res) => {
   const { id, name, age, location, language } = req.body;
+
+  console.log(req.body);
 
   if (!id || !name || !age || !location || !language) {
     return res
@@ -167,7 +169,7 @@ router.get("/convo-history", async (req, res) => {
 });
 
 // Input: { userId: string, callerInput: string, keywordInput: string (optional) }
-// Output: 
+// Output:
 //   - If disclaimer: audio/mpeg file
 //   - Else: { suggestions: [string, string, string], disclaimer: string (optional) }
 router.post("/process-input", async (req, res) => {
@@ -205,7 +207,7 @@ router.post("/process-input", async (req, res) => {
     disclaimer = generateDisclaimer(conversation.userProfile);
     try {
       const audioContent = await textToSpeech(disclaimer);
-      
+
       res.set({
         "Content-Type": "audio/mpeg",
         "Content-Disposition": 'attachment; filename="disclaimer.mp3"',
