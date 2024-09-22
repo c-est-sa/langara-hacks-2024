@@ -1,6 +1,4 @@
 {
-  "context": "\nAgent: I'm not familiar with 'asdfasdf'. Can you explain further or try using a different term?",
-  "historicalChoices": [
-    "I'm not familiar with 'asdfasdf'. Can you explain further or try using a different term?"
-  ]
+  "context": "",
+  "historicalChoices": []
 }

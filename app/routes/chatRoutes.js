@@ -28,6 +28,14 @@ async function readUserData() {
   }
 }
 
+async function writeUserData(data) {
+  try {
+    await fs.writeFile(USER_DATA_FILE, JSON.stringify(data, null, 2));
+  } catch (error) {
+    console.error("Error writing user data:", error);
+  }
+}
+
 async function readChatContext() {
   try {
     const data = await fs.readFile(CHAT_CONTEXT_FILE, "utf8");
