@@ -119,7 +119,8 @@ const Chat = () => {
     }
   };
 
-  const getSuggestions = async () => {
+  const getSuggestions = async (e) => {
+    e.preventDefault();
     console.log(transcript, keywords);
     const res = await axios.post(
       "http://localhost:3000/api/chat/process-input",
@@ -253,29 +254,33 @@ const Chat = () => {
       </Box>
 
       <Box sx={styles.inputContainer}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* <form> */}
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Type keywords..."
-            value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              setKeywords(e.target.value);
-            }}
-            sx={{ mr: 1 }}
-          />
-
-          <Button
-            variant="contained"
-            endIcon={<AssistantIcon />}
-            onClick={getSuggestions}
-            disabled={recording || !input}
+        <Box>
+          <form
+            style={{ display: "flex", alignItems: "center" }}
+            onSubmit={getSuggestions}
           >
-            get suggestions
-          </Button>
-          {/* </form> */}
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Type keywords..."
+              value={input}
+              onChange={(e) => {
+                setInput(e.target.value);
+                setKeywords(e.target.value);
+              }}
+              sx={{ mr: 1 }}
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              endIcon={<AssistantIcon />}
+              // onClick={getSuggestions}
+              disabled={recording || !input}
+            >
+              get suggestions
+            </Button>
+          </form>
         </Box>
         <IconButton
           color="primary"

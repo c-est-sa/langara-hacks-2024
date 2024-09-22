@@ -1,4 +1,6 @@
 {
-  "context": "",
-  "historicalChoices": []
+  "context": "\nCaller: \nAgent: In New York, it's normal for people in their mid-20s to be independent and building their careers.",
+  "historicalChoices": [
+    "In New York, it's normal for people in their mid-20s to be independent and building their careers."
+  ]
 }
