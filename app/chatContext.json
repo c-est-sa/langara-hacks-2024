@@ -1,4 +1,7 @@
 {
-  "context": "",
-  "historicalChoices": []
+  "context": "\nCaller: hello this is langara Bank calling how can I help you\nAgent: I have a question about my recent account activity, could you provide some information?\nCaller: do you have any ideas with you today\nAgent: I'm not sure what you mean by ideas. My question is about my account activity. Can you assist me with that?",
+  "historicalChoices": [
+    "I have a question about my recent account activity, could you provide some information?",
+    "I'm not sure what you mean by ideas. My question is about my account activity. Can you assist me with that?"
+  ]
 }

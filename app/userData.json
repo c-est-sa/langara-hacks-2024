@@ -2,9 +2,9 @@
   "users": [
     {
       "id": "1",
-      "name": "Sara",
+      "name": "Sarah",
       "age": 25,
-      "location": "New York",      
+      "location": "New York",
       "language": "English"
     }
   ]

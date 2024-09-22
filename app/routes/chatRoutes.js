@@ -58,7 +58,9 @@ async function generateSuggestions(input, context, user) {
   const apiKey = process.env.OPENAI_API_KEY;
   const url = "https://api.openai.com/v1/chat/completions";
 
-  const keywordPrompt = input.keywordInput ? `\nKeyword: ${input.keywordInput}` : "";
+  const keywordPrompt = input.keywordInput
+    ? `\nKeyword: ${input.keywordInput}`
+    : "";
 
   const prompt = `Given the following context:
 User Profile: Name: ${user.name} Age: ${user.age}, Location: ${user.location}, Language: ${user.language}
@@ -94,7 +96,10 @@ Each response should be concise, from the user's and easy to articulate.`;
 
     return suggestions;
   } catch (error) {
-    console.error("Error calling OpenAI API:", error.response ? error.response.data : error.message);
+    console.error(
+      "Error calling OpenAI API:",
+      error.response ? error.response.data : error.message
+    );
     throw new Error("Failed to generate suggestions from OpenAI");
   }
 }
@@ -137,7 +142,9 @@ router.post("/process-input", async (req, res) => {
     const userProfile = userData.users.find((user) => user.id === userId);
 
     if (!userProfile) {
-      return res.status(404).json({ error: "User profile not found for the given userId" });
+      return res
+        .status(404)
+        .json({ error: "User profile not found for the given userId" });
     }
 
     conversation = { userProfile, ...chatContext };
@@ -172,9 +179,9 @@ router.post("/process-input", async (req, res) => {
     );
 
     conversation.lastSuggestions = suggestions;
-    res.json({ 
-      suggestions, 
-      disclaimer 
+    res.json({
+      suggestions,
+      disclaimer,
     });
   } catch (error) {
     console.error("Error generating suggestions:", error);
@@ -188,13 +195,27 @@ function generateDisclaimer(userProfile) {
   I'm using EasyTalk. Thanks for your understanding!`;
 }
 
+// Input: {}
+// Output: { context: string, historicalChoices: [string, string, string] }
+router.get("/convo-history", async (req, res) => {
+  try {
+    const chatContext = await readChatContext();
+    res.json(chatContext);
+  } catch (error) {
+    console.error("Error retrieving chat context:", error);
+    res.status(500).json({ error: "Failed to retrieve chat context" });
+  }
+});
+
 // Input: { userId: string, chosenSuggestion: string }
 // Output: Audio file (MP3 format)
 router.post("/choose-suggestion", async (req, res) => {
   const { userId, chosenSuggestion } = req.body;
 
   if (!userId || !chosenSuggestion) {
-    return res.status(400).json({ error: "Missing userId or chosenSuggestion" });
+    return res
+      .status(400)
+      .json({ error: "Missing userId or chosenSuggestion" });
   }
 
   let conversation = activeConversations.get(userId);
@@ -212,7 +233,9 @@ router.post("/choose-suggestion", async (req, res) => {
 
   try {
     // Generate disclaimer audio first
-    const disclaimerAudioContent = await textToSpeech(generateDisclaimer(conversation.userProfile));
+    const disclaimerAudioContent = await textToSpeech(
+      generateDisclaimer(conversation.userProfile)
+    );
 
     // Generate audio for the chosen suggestion
     const suggestionAudioContent = await textToSpeech(chosenSuggestion);
@@ -224,10 +247,12 @@ router.post("/choose-suggestion", async (req, res) => {
     });
 
     // Send both audio files in the desired order (disclaimer first)
-    res.send(Buffer.concat([
-      Buffer.from(disclaimerAudioContent, "binary"),
-      Buffer.from(suggestionAudioContent, "binary"),
-    ]));
+    res.send(
+      Buffer.concat([
+        Buffer.from(disclaimerAudioContent, "binary"),
+        Buffer.from(suggestionAudioContent, "binary"),
+      ])
+    );
   } catch (error) {
     console.error("Error during Text-to-Speech:", error);
     res.status(500).json({ error: "Failed to convert text to speech" });
@@ -251,6 +276,40 @@ router.post("/end-call", async (req, res) => {
   } catch (error) {
     console.error("Error ending call:", error);
     res.status(500).json({ error: "Failed to end call and clear context" });
+  }
+});
+
+// Input: {}
+// Output: { id: string, name: string, age: number, location: string, language: string }
+router.get("/user-profile", async (req, res) => {
+  try {
+    const userData = await readUserData();
+    if (!userData || !userData.users || userData.users.length === 0) {
+      return res.status(404).json({ error: "User profile not found" });
+    }
+    res.json(userData.users[0]); // Assuming single user for demo
+  } catch (error) {
+    console.error("Error retrieving user profile:", error);
+    res.status(500).json({ error: "Failed to retrieve user profile" });
+  }
+});
+
+router.post("/user-profile", async (req, res) => {
+  const { id, name, age, location, language } = req.body;
+
+  if (!id || !name || !age || !location || !language) {
+    return res
+      .status(400)
+      .json({ error: "Missing required fields for user profile" });
+  }
+
+  try {
+    const userData = { users: [{ id, name, age, location, language }] };
+    await writeUserData(userData);
+    res.json({ message: "User profile saved successfully" });
+  } catch (error) {
+    console.error("Error saving user profile:", error);
+    res.status(500).json({ error: "Failed to save user profile" });
   }
 });
 
