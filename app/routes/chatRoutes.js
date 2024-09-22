@@ -113,7 +113,7 @@ async function textToSpeech(text) {
 
   try {
     const [response] = await ttsClient.synthesizeSpeech(request);
-    return response.audioContent;
+    return Buffer.from(response.audioContent, 'base64');
   } catch (error) {
     console.error("Error generating speech:", error);
     throw new Error("Failed to generate speech");
@@ -167,7 +167,9 @@ router.get("/convo-history", async (req, res) => {
 });
 
 // Input: { userId: string, callerInput: string, keywordInput: string (optional) }
-// Output: { suggestions: [string, string, string] }
+// Output: 
+//   - If disclaimer: audio/mpeg file
+//   - Else: { suggestions: [string, string, string], disclaimer: string (optional) }
 router.post("/process-input", async (req, res) => {
   const { userId, callerInput, keywordInput = "" } = req.body;
 
@@ -197,6 +199,24 @@ router.post("/process-input", async (req, res) => {
     activeConversations.set(userId, conversation);
   }
 
+  // Check if it's the first time the user talks and there's no "\nAgent" in the context
+  let disclaimer = null;
+  if (!conversation.context.includes("\nAgent")) {
+    disclaimer = generateDisclaimer(conversation.userProfile);
+    try {
+      const audioContent = await textToSpeech(disclaimer);
+      
+      res.set({
+        "Content-Type": "audio/mpeg",
+        "Content-Disposition": 'attachment; filename="disclaimer.mp3"',
+      });
+
+      return res.send(audioContent);
+    } catch (error) {
+      console.error("Error generating disclaimer audio:", error);
+    }
+  }
+
   // Only add to context if callerInput is not empty
   if (callerInput && callerInput.trim() !== "") {
     conversation.context += `\nCaller: ${callerInput.trim()}`;
@@ -214,12 +234,18 @@ router.post("/process-input", async (req, res) => {
     );
 
     conversation.lastSuggestions = suggestions;
-    res.json({ suggestions });
+    res.json({ suggestions, disclaimer });
   } catch (error) {
     console.error("Error generating suggestions:", error);
     res.status(500).json({ error: "Failed to generate suggestions" });
   }
 });
+
+function generateDisclaimer(userProfile) {
+  return `Hello! I'm ${userProfile.name}. I currently have difficulty communicating smoothly.
+  I'm using EasyTalk that helps me express myself better and turning my text into speech.
+  Thanks for your patience and understanding!`;
+}
 
 // Input: { userId: string, chosenSuggestion: string }
 // Output: Audio file (MP3 format)
@@ -253,7 +279,7 @@ router.post("/choose-suggestion", async (req, res) => {
       "Content-Disposition": 'attachment; filename="response.mp3"',
     });
 
-    res.send(Buffer.from(audioContent, "binary"));
+    return res.send(audioContent);
   } catch (error) {
     console.error("Error during Text-to-Speech:", error);
     res.status(500).json({ error: "Failed to convert text to speech" });
